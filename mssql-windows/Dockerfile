@@ -2,7 +2,8 @@
 
 # adapted from https://github.com/microsoft/mssql-docker/blob/e4afa866646c25decef32f8946a995074c3251e7/windows/mssql-server-windows-express/dockerfile
 
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+ARG WINDOWS_SERVER_VERSION=ltsc2019
+FROM mcr.microsoft.com/windows/servercore:${WINDOWS_SERVER_VERSION}
 
 # Download Links:
 ENV sql_express_download_url "https://go.microsoft.com/fwlink/?linkid=829176"

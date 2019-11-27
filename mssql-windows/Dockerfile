@@ -15,8 +15,6 @@ ENV sa_password="_" `
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# make install files accessible
-COPY start.ps1 /
 WORKDIR /
 
 RUN Invoke-WebRequest -Uri $env:sql_express_download_url -OutFile sqlexpress.exe ; `
@@ -29,4 +27,6 @@ RUN stop-service MSSQL`$SQLEXPRESS ; `
     set-itemproperty -path 'HKLM:\\software\\microsoft\\microsoft sql server\\mssql14.SQLEXPRESS\\mssqlserver\\supersocketnetlib\\tcp\\ipall' -name tcpport -value 1433 ; `
     set-itemproperty -path 'HKLM:\\software\\microsoft\\microsoft sql server\\mssql14.SQLEXPRESS\\mssqlserver\\' -name LoginMode -value 2 ;
 
-ENTRYPOINT ./start -sa_password $env:sa_password -ACCEPT_EULA $env:ACCEPT_EULA -attach_dbs `"$env:attach_dbs`" -Verbose
+COPY start.ps1 /
+
+CMD .\start -sa_password $env:sa_password -ACCEPT_EULA $env:ACCEPT_EULA -attach_dbs \"$env:attach_dbs\" -Verbose

@@ -45,6 +45,17 @@ services:
   # will typically restore from backed-up database using SQL Management Studio
   # or Azure Data Studio when they first open a solution.
   #
+  # When running BOTH the web service and the database service (i.e.,
+  # using `docker-compose up`), the connection string should look like this:
+  #   Server=db,1433;Database=MyProject;User ID=sa;Password=p@ssw0rd;
+  #
+  # When running ONLY the database service (i.e., using `docker-compose start db`),
+  # the connection string should look like this:
+  #   Server=localhost,1433;Database=MyProject;User ID=sa;Password=p@ssw0rd;
+  #
+  # (if you are running Docker in a VM, substitute "localhost" above with the
+  # name of your docker host)
+  #
   # NOTE: the default Restore options will put the .mdf and .ldf
   # files in subdirectories of UserDbs, which will not propagate back
   # to the bound volume. Developers should change these default paths

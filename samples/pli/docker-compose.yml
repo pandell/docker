@@ -1,0 +1,66 @@
+# example docker-compose.yml file for a Pli application
+
+# environment variables are defined in the adjacent .env file,
+# which may be used for allow developer-specific overrides
+
+# available environment variables:
+# - SOLUTION_ROOT (default=.) - relative/absolute path to the solution
+
+version: "3.7"
+
+# this file defines two services: web and db
+# services will typically be run together via `docker-compose up`, but
+# may be run individually using `docker-compose start [service]`
+
+services:
+  # "web" runs the server-side web application using ASP.NET and
+  # the specified .NET version. The application is bound to port 9000
+  # on the docker host and runs at the root URL (e.g., http://localhost:9000/)
+  #
+  # Projects with multiple web applications will have to define them
+  # using different ports, e.g., 9000, 9001, etc.
+  #
+  # Developers may attach a debug monitor to a running web service using
+  # the following command:
+  #   docker-compose exec web ./debug
+  web:
+    build:
+      context: https://github.com/pandell/docker.git#:aspnet-framework
+      args:
+        - DOTNET_VERSION=4.8
+    depends_on:
+      - db
+    ports:
+      - "9000:80"
+    volumes:
+      - type: bind
+        source: ${SOLUTION_ROOT}/src/Pandell.MyProject.Web # change this path
+        target: C:/inetpub/wwwroot
+      - type: bind
+        source: ${SOLUTION_ROOT}/.filestore
+        target: C:/FileStore
+
+  # "db" runs an MSSQL Express instance and attaches a database
+  # file contained in the /data directory of the solution. Developers
+  # will typically restore from backed-up database using SQL Management Studio
+  # or Azure Data Studio when they first open a solution.
+  #
+  # NOTE: the default Restore options will put the .mdf and .ldf
+  # files in subdirectories of UserDbs, which will not propagate back
+  # to the bound volume. Developers should change these default paths
+  # so that both .mdf and .ldf are output to the same directory (C:/Sql/UserDbs).
+  db:
+    build:
+      context: https://github.com/pandell/docker.git#:mssql-windows
+      args:
+        - WINDOWS_SERVER_VERSION=ltsc2019
+    environment:
+      - ACCEPT_EULA=Y
+      - sa_password=p@ssw0rd
+      - attach_dbs=[{'dbName':'MyProject','dbFiles':['C:\\Sql\\UserDbs\\MyProject.mdf','C:\\Sql\\UserDbs\\MyProject_log.ldf']}] # change "MyProject" appropriately
+    ports:
+      - "1433:1433"
+    volumes:
+      - type: bind
+        source: ${SOLUTION_ROOT}/.data
+        target: C:/Sql/UserDbs

@@ -1,0 +1,13 @@
+{
+  "tabWidth": 4,
+  "printWidth": 120,
+  "quoteProps": "preserve",
+  "overrides": [
+    {
+      "files": ["*.json", ".*.json", "*.yml"],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ]
+}
